@@ -1,0 +1,14 @@
+site_name: An Vuong
+extra_javascript: 
+    - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+
+markdown_extensions:
+    - mdx_math
+pages:
+    - Home: 'index.md'
+    - Machine Learning: 
+            - 'About Machine Learning': 'ml/about-ml.md'
+    - Deep Learning: 
+            - 'About Deep Learning': 'dl/about-dl.md'
+            - 'Neural Art Transfer': 'dl/neural-art-transfer.md'
+    - About: 'about.md'
