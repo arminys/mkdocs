@@ -77,12 +77,7 @@
         },
         {
             "location": "/about/",
-            "text": "About me\n\n\nI'm a fresh undergraduate with background in Electrical Engineering.\n\n\nContact me: anvuongbk13@gmail.com",
-            "title": "About"
-        },
-        {
-            "location": "/about/#about-me",
-            "text": "I'm a fresh undergraduate with background in Electrical Engineering.  Contact me: anvuongbk13@gmail.com",
+            "text": "I'm a fresh undergraduate with background in Electrical Engineering.\n\n\nContact me: anvuongbk13@gmail.com",
             "title": "About me"
         }
     ]
