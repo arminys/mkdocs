@@ -1,0 +1,89 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "Machine Learning and Deep Learning documents\n\n\nDocuments of my learning.\n\n\nWhat is this?\n\n\nThis is a personal directory to store my works (code, documentations, understandings, etc.) of several MOOC I have enrolled, \nThe knowledge generally falls into either Machine Learning or Deep Learning. \n\n\nThis site contains my implementations in tensorFlow of some state-of-theart Neural Networks.",
+            "title": "Home"
+        },
+        {
+            "location": "/#machine-learning-and-deep-learning-documents",
+            "text": "Documents of my learning.",
+            "title": "Machine Learning and Deep Learning documents"
+        },
+        {
+            "location": "/#what-is-this",
+            "text": "This is a personal directory to store my works (code, documentations, understandings, etc.) of several MOOC I have enrolled, \nThe knowledge generally falls into either Machine Learning or Deep Learning.   This site contains my implementations in tensorFlow of some state-of-theart Neural Networks.",
+            "title": "What is this?"
+        },
+        {
+            "location": "/ml/about-ml/",
+            "text": "Machine Learning\n\n\nI'm still documenting.",
+            "title": "About Machine Learning"
+        },
+        {
+            "location": "/ml/about-ml/#machine-learning",
+            "text": "I'm still documenting.",
+            "title": "Machine Learning"
+        },
+        {
+            "location": "/dl/about-dl/",
+            "text": "Deep Learning\n\n\nI'm still documenting.",
+            "title": "About Deep Learning"
+        },
+        {
+            "location": "/dl/about-dl/#deep-learning",
+            "text": "I'm still documenting.",
+            "title": "Deep Learning"
+        },
+        {
+            "location": "/dl/neural-art-transfer/",
+            "text": "Artistic Neural Transfer\n\n\nThis post is my understanding from Coursera's Convolutional Neural Networks course, the implementation is what I've done as \nrequired assignment, minor modifications added for documenting purpose.\n\n\nArtistic Neural Transfer is a very fun part of Deep Learning and has gained a respectable reputation during last several years.\nThe neural network will receive 2 input images, namely, content image and style image. As the names suggest, its corressponding output\nwill (hopely) be the content image \"redrawn\" in the style of style image.\n\n\nExamples\n\n\nHere are 3 examples of what Artistic Neural Transfer can do. The left and middle image are respectively content and style inputs,\nthe output is shown on the right image.\n\n\n\n\n\n\n\n\nHow does it work?\n\n\nDifferent from other neural networks, an ArtNN does not learn weights/parameters of neurons during its training time. Instead,\nit makes use of a pretrained deep ConvNet, feed it 2 input images (content and style) then it will learn the pixel of the output image.\n\n\nThe conv layers are \"frozen\" at training time and input layer is allowed to change. In order to do this, we would like to define a new\ncost function based on Content cost and Style cost.\n\n\nBefore moving on, let's denote content image as C, style image as S and output image as G (generated image)\n\n\nContent cost\n\n\nContent cost is calculated at one layer of the ConvNet. Usually, this layer should be somewhere in the middle of the network (not too deep\nor too shallow), let's say we've chosen layer \ni\n to calculate content cost. Then this cost is equal to the sum of square of difference of \ncorresponding activation units of layer \ni\n with respect to C and G. Well, if that sounds like alien language, let's look at this formula:\n\n\n\n\nJ_{content}(C,G) =  \\frac{1}{4 \\times n_H \\times n_W \\times n_C}\\sum _{ \\text{all entries}} (a^{(C)} - a^{(G)})^2 \n\n\n\n\nBetter right? \na^{(C)}\n and \na^{(G)}\n are the activation units of layer \ni\n when the input are C and G respectively.\n\nn_{H}\n, \nn_{W}\n and \nn_{C}\n are correspondingly height, width and depth (channel) of the layer, they play as normalizing coefficients.\n\n\nStyle cost\n\n\nStyle cost is a little bit trickier. In order for G to have the same \"art style\" of S, we make use an idea that if, at layer \ni\n, the correlations of\ndifferent channels of that layer filter when input are G and S, respectively, are similar. Let's look at the formula:\n\n\n\n\nJ_{style}^{[l]}(S,G) = \\frac{1}{4 \\times {n_C}^2 \\times (n_H \\times n_W)^2} \\sum _{i=1}^{n_C}\\sum_{j=1}^{n_C}(G^{M(S)}_{ij} - G^{M(G)}_{ij})^2 \n\n\n\n\n\n\nG^{M}\n is the Gram matrix, I denote it as \nG^{M}\n instead of conventional \nG\n to avoid confusion with input image G. This Gram matrix \nG^{M}\n\ncalculate the correlation between diffent channels of a filter. The following figure (take from Prof. Andrew Ng's Deep learning Coursera course) does a \nperfect visualization:\n\n\n\n\nNote that \nJ_{style}^{[l]}(S,G)\n is caculated on a specific layer \nl\n, since different layers in ConvNet learn different characteristics of the image,\nwe will want to calculate\nJ_{style}^{[l]}(S,G)\n on several different layers, thus what layers to calculate \nJ_{style}^{[l]}(S,G)\n is another hyperparameter.  \n\n\nAlso for each value of \nJ_{style}^{[l]}(S,G)\n we may want to assign a weight to it, for example, the following code contains Style cost parameters in my implementation, \nfirst value is the layer name, second value is the weight of that layer style cost:\n\n\nSTYLE_LAYERS = [\n    ('conv1_1', 0.125),\n    ('conv2_1', 0.125),\n    ('conv3_1', 0.125),\n    ('conv3_4', 0.125),\n    ('conv4_1', 0.125),\n    ('conv5_1', 0.125),\n    ('conv5_2', 0.125),\n    ('conv5_4', 0.125),]\n\n\n\n\nThen total Style cost would look like:\n\n\n\n\nJ_{style}(S,G) = \\sum_{l} \\lambda^{[l]} J^{[l]}_{style}(S,G)\n\nwhere \n\\lambda\n is the weight matrix of Style cost.\n\n\nTotal cost\n\n\nWith both Content cost and Style cost in hands, the Total cost will just be the weighted sum of those two:\n\nJ(G) = \\alpha J_{content}(C,G) + \\beta J_{style}(S,G)\n\n\n\n\nImplementation\n\n\nWith the well-defined cost function, the implementation is pretty straightforward in Python using tensorFlow.\n\n\nIn the implementation, a pretrained VGG19 very deep network is used.\n\n\n\nWhole project can be found at: \nArtNeuralTransfer\n. You can simply run it by the following command:\n\n\npython neural-art.py content_image style_image\n\n\n\n\noutput image can be found in output folder, several example images are included, for example, to generate the first example shown above, the command should be:\n\n\npython neural-art.py cat.jpg stone.jpg",
+            "title": "Neural Art Transfer"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#artistic-neural-transfer",
+            "text": "This post is my understanding from Coursera's Convolutional Neural Networks course, the implementation is what I've done as \nrequired assignment, minor modifications added for documenting purpose.  Artistic Neural Transfer is a very fun part of Deep Learning and has gained a respectable reputation during last several years.\nThe neural network will receive 2 input images, namely, content image and style image. As the names suggest, its corressponding output\nwill (hopely) be the content image \"redrawn\" in the style of style image.",
+            "title": "Artistic Neural Transfer"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#examples",
+            "text": "Here are 3 examples of what Artistic Neural Transfer can do. The left and middle image are respectively content and style inputs,\nthe output is shown on the right image.",
+            "title": "Examples"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#how-does-it-work",
+            "text": "Different from other neural networks, an ArtNN does not learn weights/parameters of neurons during its training time. Instead,\nit makes use of a pretrained deep ConvNet, feed it 2 input images (content and style) then it will learn the pixel of the output image.  The conv layers are \"frozen\" at training time and input layer is allowed to change. In order to do this, we would like to define a new\ncost function based on Content cost and Style cost.  Before moving on, let's denote content image as C, style image as S and output image as G (generated image)",
+            "title": "How does it work?"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#content-cost",
+            "text": "Content cost is calculated at one layer of the ConvNet. Usually, this layer should be somewhere in the middle of the network (not too deep\nor too shallow), let's say we've chosen layer  i  to calculate content cost. Then this cost is equal to the sum of square of difference of \ncorresponding activation units of layer  i  with respect to C and G. Well, if that sounds like alien language, let's look at this formula:   J_{content}(C,G) =  \\frac{1}{4 \\times n_H \\times n_W \\times n_C}\\sum _{ \\text{all entries}} (a^{(C)} - a^{(G)})^2    Better right?  a^{(C)}  and  a^{(G)}  are the activation units of layer  i  when the input are C and G respectively. n_{H} ,  n_{W}  and  n_{C}  are correspondingly height, width and depth (channel) of the layer, they play as normalizing coefficients.",
+            "title": "Content cost"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#style-cost",
+            "text": "Style cost is a little bit trickier. In order for G to have the same \"art style\" of S, we make use an idea that if, at layer  i , the correlations of\ndifferent channels of that layer filter when input are G and S, respectively, are similar. Let's look at the formula:   J_{style}^{[l]}(S,G) = \\frac{1}{4 \\times {n_C}^2 \\times (n_H \\times n_W)^2} \\sum _{i=1}^{n_C}\\sum_{j=1}^{n_C}(G^{M(S)}_{ij} - G^{M(G)}_{ij})^2     G^{M}  is the Gram matrix, I denote it as  G^{M}  instead of conventional  G  to avoid confusion with input image G. This Gram matrix  G^{M} \ncalculate the correlation between diffent channels of a filter. The following figure (take from Prof. Andrew Ng's Deep learning Coursera course) does a \nperfect visualization:   Note that  J_{style}^{[l]}(S,G)  is caculated on a specific layer  l , since different layers in ConvNet learn different characteristics of the image,\nwe will want to calculate J_{style}^{[l]}(S,G)  on several different layers, thus what layers to calculate  J_{style}^{[l]}(S,G)  is another hyperparameter.    Also for each value of  J_{style}^{[l]}(S,G)  we may want to assign a weight to it, for example, the following code contains Style cost parameters in my implementation, \nfirst value is the layer name, second value is the weight of that layer style cost:  STYLE_LAYERS = [\n    ('conv1_1', 0.125),\n    ('conv2_1', 0.125),\n    ('conv3_1', 0.125),\n    ('conv3_4', 0.125),\n    ('conv4_1', 0.125),\n    ('conv5_1', 0.125),\n    ('conv5_2', 0.125),\n    ('conv5_4', 0.125),]  Then total Style cost would look like:   J_{style}(S,G) = \\sum_{l} \\lambda^{[l]} J^{[l]}_{style}(S,G) \nwhere  \\lambda  is the weight matrix of Style cost.",
+            "title": "Style cost"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#total-cost",
+            "text": "With both Content cost and Style cost in hands, the Total cost will just be the weighted sum of those two: J(G) = \\alpha J_{content}(C,G) + \\beta J_{style}(S,G)",
+            "title": "Total cost"
+        },
+        {
+            "location": "/dl/neural-art-transfer/#implementation",
+            "text": "With the well-defined cost function, the implementation is pretty straightforward in Python using tensorFlow.  In the implementation, a pretrained VGG19 very deep network is used.  Whole project can be found at:  ArtNeuralTransfer . You can simply run it by the following command:  python neural-art.py content_image style_image  output image can be found in output folder, several example images are included, for example, to generate the first example shown above, the command should be:  python neural-art.py cat.jpg stone.jpg",
+            "title": "Implementation"
+        },
+        {
+            "location": "/about/",
+            "text": "About me\n\n\nI'm a fresh undergraduate with background in Electrical Engineering.",
+            "title": "About"
+        },
+        {
+            "location": "/about/#about-me",
+            "text": "I'm a fresh undergraduate with background in Electrical Engineering.",
+            "title": "About me"
+        }
+    ]
+}
