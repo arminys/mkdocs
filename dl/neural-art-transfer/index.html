@@ -450,7 +450,7 @@ corresponding activation units of layer <strong><em>i</em></strong> with respect
 <p>Better right? <script type="math/tex">a^{(C)}</script> and <script type="math/tex">a^{(G)}</script> are the activation units of layer <strong><em>i</em></strong> when the input are C and G respectively.
 <script type="math/tex">n_{H}</script>, <script type="math/tex">n_{W}</script> and <script type="math/tex">n_{C}</script> are correspondingly height, width and depth (channel) of the layer, they play as normalizing coefficients.</p>
 <h3 id="style-cost">Style cost</h3>
-<p>Style cost is a little bit trickier. In order for G to have the same "art style" of S, we make use an idea that if, at layer <strong><em>i</em></strong>, the correlations of
+<p>Style cost is a little bit trickier. In order for G to have the same "art style" of S, we make use of an idea that if, at layer <strong><em>i</em></strong>, the correlations of
 different channels of that layer filter when input are G and S, respectively, are similar. Let's look at the formula:</p>
 <p>
 <script type="math/tex; mode=display">J_{style}^{[l]}(S,G) = \frac{1}{4 \times {n_C}^2 \times (n_H \times n_W)^2} \sum _{i=1}^{n_C}\sum_{j=1}^{n_C}(G^{M(S)}_{ij} - G^{M(G)}_{ij})^2 </script>
